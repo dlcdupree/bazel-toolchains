@@ -18,6 +18,11 @@ load(
     "jessie_package_names",
 )
 
+load(
+    "//skylib:stretch_package_names.bzl",
+    "stretch_package_names",
+)
+
 # Use http_archive rule instead of git_repository rule
 # https://docs.bazel.build/versions/master/be/workspace.html#git_repository
 http_archive(
@@ -37,9 +42,18 @@ container_repositories()
 
 container_pull(
     name = "debian8",
+    # this si the same as the lastest tag
     digest = "sha256:412ef4d53215ff4a95d275ad48fe5196cb51f4f96b99c05058054b3bdf9443c1",
     registry = "gcr.io",
     repository = "cloud-marketplace/google/debian8",
+)
+
+container_pull(
+    name = "debian9",
+    # again, same as latest tag
+    digest = "sha256:f3d5fe96abed24c693b25b18b4d37aa62612046ab35eda7e661952e2271c1b6e",
+    registry = "gcr.io",
+    repository = "cloud-marketplace/google/debian9",
 )
 
 container_pull(
@@ -50,10 +64,47 @@ container_pull(
 )
 
 container_pull(
+    name = "debian9-clang",
+    digest = "sha256:ac3b1fdc22c0f2b95abe67f2daf33788425fab52d4e6845900bfe1a42443098f",
+    registry = "gcr.io",
+    repository = "cloud-marketplace/google/clang-debian8",
+)
+
+# Created for //test:debian8_clang_autoconfig_test.
+# Do not modify the container sha.
+container_pull(
+    name = "debian8-clang-test",
+    digest = "sha256:e57978199c9eb156bd7f63773387f3a238adf61acd71c4942ad91da50b4f241f",
+    registry = "gcr.io",
+    repository = "cloud-marketplace/google/clang-debian8",
+)
+
+container_pull(
+    name = "debian9-clang-test",
+    digest = "sha256:e57978199c9eb156bd7f63773387f3a238adf61acd71c4942ad91da50b4f241f",
+    registry = "gcr.io",
+    repository = "cloud-marketplace/google/clang-debian8",
+)
+
+container_pull(
     name = "official_jessie",
     registry = "index.docker.io",
     repository = "library/debian",
     tag = "jessie",
+)
+
+container_pull(
+    name = "official_stretch",
+    registry = "index.docker.io",
+    repository = "library/debian",
+    tag = "stretch",
+)
+
+container_pull(
+    name = "official_trusty",
+    registry = "index.docker.io",
+    repository = "library/ubuntu",
+    tag = "14.04",
 )
 
 container_pull(
@@ -121,6 +172,16 @@ dpkg_src(
 )
 
 dpkg_src(
+    name = "debian_stretch",
+    arch = "amd64",
+    distro = "stretch",
+    sha256 = "186cb62b5b21c778637c0aac0e74c3fdefcdd5853065645ace65503232eab25a",
+    snapshot = "20180130T043019Z",
+    url = "http://snapshot.debian.org/archive",
+)
+
+
+dpkg_src(
     name = "debian_jessie_backports",
     arch = "amd64",
     distro = "jessie-backports",
@@ -130,10 +191,28 @@ dpkg_src(
 )
 
 dpkg_src(
+    name = "debian_stretch_backports",
+    arch = "amd64",
+    distro = "stretch-backports",
+    sha256 = "bb4c9c16c4235376f71ea58b2e8c48428c10d5fd351d0caccd67cf1065bf9e52",
+    snapshot = "20180130T043019Z",
+    url = "http://snapshot.debian.org/archive",
+)
+
+dpkg_src(
     name = "debian_jessie_ca_certs",
     arch = "amd64",
     distro = "jessie",
     sha256 = "26e8275be588d35313eac65a1a88b17a1052eb323255048b13bdf0653421a9f2",
+    snapshot = "20161107T033615Z",
+    url = "http://snapshot.debian.org/archive",
+)
+
+dpkg_src(
+    name = "debian_stretch_ca_certs",
+    arch = "amd64",
+    distro = "stretch",
+    sha256 = "dd2e47f2db75120c2c2341b7bf0e3bfa026f70322a433e6d327eb018f9ee9ac8",
     snapshot = "20161107T033615Z",
     url = "http://snapshot.debian.org/archive",
 )
@@ -148,10 +227,27 @@ dpkg_list(
 )
 
 dpkg_list(
+    name = "stretch_package_bundle",
+    packages = stretch_package_names(),
+    sources = [
+        "@debian_stretch//file:Packages.json",
+        "@debian_stretch_backports//file:Packages.json",
+    ],
+)
+
+dpkg_list(
     name = "jessie_ca_certs_package_bundle",
     packages = ["ca-certificates-java"],
     sources = [
         "@debian_jessie_ca_certs//file:Packages.json",
+    ],
+)
+
+dpkg_list(
+    name = "stretch_ca_certs_package_bundle",
+    packages = ["ca-certificates-java"],
+    sources = [
+        "@debian_stretch_ca_certs//file:Packages.json",
     ],
 )
 
